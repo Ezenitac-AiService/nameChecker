@@ -1,0 +1,26 @@
+[package]
+name = "namechecker-gui"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Pure-Rust 3-pane desktop GUI for CJK cross-platform filename and folder checker"
+
+[lib]
+name = "namechecker_gui"
+path = "src/lib.rs"
+
+[[bin]]
+name = "namechecker-gui"
+path = "src/main.rs"
+
+[dependencies]
+eframe = "0.37.0"
+egui = "0.37.0"
+egui_extras = "0.37.0"
+namechecker-core = { path = "../namechecker-core" }
+rfd = "0.17.2"
+
+[dev-dependencies]
+egui_kittest = "0.37.0"
+tempfile = "3.27.0"

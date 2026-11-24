@@ -1,0 +1,35 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/namechecker-core",
+    "crates/namechecker-cli",
+    "crates/namechecker-gui",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+authors = ["nameChecker Contributors"]
+description = "Cross-platform CJK filename and folder encoding, normalization, and collation checker"
+
+[profile.dev.package.icu_collator]
+opt-level = 3
+
+[profile.dev.package.icu_normalizer]
+opt-level = 3
+
+[profile.dev.package.icu_collections]
+opt-level = 3
+
+[profile.dev.package.zerovec]
+opt-level = 3
+
+[profile.dev.package.icu_properties]
+opt-level = 3
+
+[profile.dev.package.icu_provider]
+opt-level = 3
+
+[profile.dev.package.icu_provider_blob]
+opt-level = 3

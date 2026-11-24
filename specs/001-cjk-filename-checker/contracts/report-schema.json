@@ -1,0 +1,261 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "NameCheckerScanReport",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "unicode_version",
+    "scanned_at_utc",
+    "total_entries",
+    "auto_fixable_count",
+    "manual_review_count",
+    "sort_discrepancy_count",
+    "collision_risk_count",
+    "encoding_counts",
+    "category_counts",
+    "before_order",
+    "predicted_after_order",
+    "io_errors",
+    "findings",
+    "rename_plans",
+    "sort_discrepancies",
+    "collision_risks"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0.0" },
+    "unicode_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "scanned_at_utc": { "type": "string", "format": "date-time" },
+    "total_entries": { "type": "integer", "minimum": 0 },
+    "auto_fixable_count": { "type": "integer", "minimum": 0 },
+    "manual_review_count": { "type": "integer", "minimum": 0 },
+    "sort_discrepancy_count": { "type": "integer", "minimum": 0 },
+    "collision_risk_count": { "type": "integer", "minimum": 0 },
+    "encoding_counts": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    },
+    "category_counts": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    },
+    "before_order": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["rank", "name", "entry_type", "has_issue"],
+        "properties": {
+          "rank": { "type": "integer", "minimum": 1 },
+          "name": { "type": "string" },
+          "entry_type": { "type": "string", "enum": ["File", "Directory", "Symlink"] },
+          "has_issue": { "type": "boolean" }
+        }
+      }
+    },
+    "predicted_after_order": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["old_rank", "new_rank", "rank_delta", "old_name", "new_name", "changed", "has_collision"],
+        "properties": {
+          "old_rank": { "type": "integer", "minimum": 1 },
+          "new_rank": { "type": "integer", "minimum": 1 },
+          "rank_delta": { "type": "integer" },
+          "old_name": { "type": "string" },
+          "new_name": { "type": "string" },
+          "changed": { "type": "boolean" },
+          "has_collision": { "type": "boolean" }
+        }
+      }
+    },
+    "io_errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "message"],
+        "properties": {
+          "path": { "type": "string" },
+          "message": { "type": "string" }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "path",
+          "parent_dir",
+          "raw_name",
+          "raw_os_name",
+          "entry_type",
+          "track",
+          "category",
+          "severity",
+          "offending_chars",
+          "suggested_name",
+          "candidate_hints",
+          "message"
+        ],
+        "properties": {
+          "id": { "type": "string" },
+          "path": { "type": "string" },
+          "parent_dir": { "type": "string" },
+          "raw_name": { "type": "string" },
+          "raw_os_name": {
+            "oneOf": [
+              {
+                "type": "object",
+                "required": ["UnixBytes"],
+                "properties": {
+                  "UnixBytes": { "type": "array", "items": { "type": "integer", "minimum": 0, "maximum": 255 } }
+                }
+              },
+              {
+                "type": "object",
+                "required": ["WindowsWide"],
+                "properties": {
+                  "WindowsWide": { "type": "array", "items": { "type": "integer", "minimum": 0, "maximum": 65535 } }
+                }
+              }
+            ]
+          },
+          "entry_type": { "type": "string", "enum": ["File", "Directory", "Symlink"] },
+          "track": { "type": "string", "enum": ["AutoFixable", "ManualReview"] },
+          "category": {
+            "type": "string",
+            "enum": [
+              "KangxiRadical",
+              "CompatibilityIdeograph",
+              "NonNfcNormalization",
+              "InvisibleZeroWidth",
+              "PunctuationVariant",
+              "InvalidUtf8",
+              "PrivateUseArea",
+              "VariationSelector",
+              "CrossScriptConfusable",
+              "ReplacementChar",
+              "WindowsSmbHazard",
+              "OrphanedTempFile"
+            ]
+          },
+          "severity": { "type": "string", "enum": ["Error", "Warning", "Info"] },
+          "offending_chars": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["char_index", "code_point", "reason"],
+              "properties": {
+                "char_index": { "type": "integer", "minimum": 0 },
+                "glyph": { "type": "string" },
+                "code_point": { "type": "string" },
+                "reason": { "type": "string" }
+              }
+            }
+          },
+          "suggested_name": { "type": ["string", "null"] },
+          "candidate_hints": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["encoding", "decoded_name"],
+              "properties": {
+                "encoding": { "type": "string" },
+                "decoded_name": { "type": "string" }
+              }
+            }
+          },
+          "message": { "type": "string" }
+        }
+      }
+    },
+    "rename_plans": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "raw_name", "raw_os_name", "composed_suggested_name", "track", "finding_ids"],
+        "properties": {
+          "path": { "type": "string" },
+          "raw_name": { "type": "string" },
+          "raw_os_name": {
+            "oneOf": [
+              {
+                "type": "object",
+                "required": ["UnixBytes"],
+                "properties": {
+                  "UnixBytes": { "type": "array", "items": { "type": "integer", "minimum": 0, "maximum": 255 } }
+                }
+              },
+              {
+                "type": "object",
+                "required": ["WindowsWide"],
+                "properties": {
+                  "WindowsWide": { "type": "array", "items": { "type": "integer", "minimum": 0, "maximum": 65535 } }
+                }
+              }
+            ]
+          },
+          "composed_suggested_name": { "type": ["string", "null"] },
+          "track": { "type": "string", "enum": ["AutoFixable", "ManualReview"] },
+          "finding_ids": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "sort_discrepancies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "parent_dir",
+          "entry_a",
+          "entry_b",
+          "baseline_profile",
+          "divergent_profiles",
+          "cause",
+          "reason"
+        ],
+        "properties": {
+          "parent_dir": { "type": "string" },
+          "entry_a": { "type": "string" },
+          "entry_b": { "type": "string" },
+          "baseline_profile": {
+            "type": "string",
+            "enum": ["WindowsKoKr", "MacOsKo", "LinuxCodePoint", "Japanese", "Chinese"]
+          },
+          "divergent_profiles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["WindowsKoKr", "MacOsKo", "LinuxCodePoint", "Japanese", "Chinese"]
+            }
+          },
+          "cause": { "type": "string", "enum": ["EncodingAnomaly", "InherentPlatformCollation"] },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "collision_risks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "parent_dir",
+          "entries",
+          "normalized_key",
+          "collision_type",
+          "affected_platforms"
+        ],
+        "properties": {
+          "parent_dir": { "type": "string" },
+          "entries": { "type": "array", "items": { "type": "string" }, "minItems": 2 },
+          "normalized_key": { "type": "string" },
+          "collision_type": {
+            "type": "string",
+            "enum": ["NormalizationNfcNfd", "CanonicalCompatibility", "CaseInsensitive"]
+          },
+          "affected_platforms": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}
